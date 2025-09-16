@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Upload e Playback - Prototipo</title>
+    <link rel="stylesheet" href="style.css">
+
+<body>
+    <h1>Upload de vídeo (Prototipo)</h1>
+
+    <div class="card">
+        <label for="file">Escolha um vídeo:</label>
+        <input id="file" type="file" accept="video/*" />
+
+        <div style="margin-top:12px;">
+            <button id="btnUpload">Fazer Upload</button>
+            <span id="status" style="margin-left:12px"></span>
+        </div>
+
+        <div id="result" style="margin-top:16px;display:none">
+            <strong>URL:</strong>
+            <div id="link"></div>
+            <video id="videoPlayer" controls></video>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        const btn = document.getElementById('btnUpload');
+        const status = document.getElementById('status');
+        const result = document.getElementById('result');
+        const linkDiv = document.getElementById('link');
+        const player = document.getElementById('videoPlayer');
+
+        btn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) { alert('Selecione um arquivo de vídeo'); return; }
+
+            status.textContent = 'Enviando...';
+            btn.disabled = true;
+
+            const fd = new FormData();
+            fd.append('file', file);
+
+            try {
+                const resp = await fetch('/upload', { method: 'POST', body: fd });
+                if (!resp.ok) throw new Error('Erro no upload');
+                const data = await resp.json();
+
+                status.textContent = 'Upload concluído';
+                result.style.display = 'block';
+                linkDiv.textContent = data.url;
+                player.src = data.url; // define o src do video para o presigned URL
+                player.load();
+            } catch (err) {
+                console.error(err);
+                status.textContent = 'Erro no upload';
+                alert('Falha ao enviar: ' + (err.message || err));
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
