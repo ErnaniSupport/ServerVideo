@@ -8,10 +8,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "aws-sdk": "^2.1692.0",
     "express": "^5.1.0",
     "multer": "^2.0.2"
-  }
+  },
+  "description": ""
 }
